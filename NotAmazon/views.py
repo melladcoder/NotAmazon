@@ -1,7 +1,18 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django import forms
 from .models import Item
+
+# Creating a register form class
+class RegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model=User
+        fields= ["username", "email", "password", "password2"]
 
 # Create your views here.
 def index(request):
@@ -21,11 +32,31 @@ def shop(request):
     return render(request, "shop.html", context)
 
 
-def signup(request):
-    return render(request, "signup.html", {})
-    
-def thankyou(request):
-    return render(request, "thankyou.html", {})
+
+def user_login(request):
+    form = AuthenticationForm(request.POST)
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
         
-def login(request):
-    return render(request, "login.html", {})
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None:
+            login(request, user)
+            return redirect("home")
+    else:
+        form = AuthenticationForm()
+
+    return render(request, "registration/user_login.html", {"form":form})
+
+def user_signup(request):
+    if request.method == "POST":
+        form = RegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("home")
+    
+    else:
+        form = RegistrationForm()
+    return render(request, "registration/user_signup.html", {"form":form})
