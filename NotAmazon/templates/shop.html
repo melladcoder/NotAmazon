@@ -1,8 +1,8 @@
-{%include "base.html"%}
+{% include "base.html" %}
 
 <body>
     <div id="content", name="content">
-        {%block content%}
+        {% block content %}
             <ul>
                 {% for item in item_list %}
                     <li>Item Name: {{item.item_name}}</li>
@@ -14,6 +14,6 @@
                     
                 {% endfor %}
             </ul>
-        {%endblock%}
+        {% endblock %}
     </div>
 </body>
